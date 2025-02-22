@@ -1,4 +1,4 @@
 .env
 venv/
 __pycache__/
-senha.db
+senhas.db
