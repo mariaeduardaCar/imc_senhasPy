@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de IMC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+        <h1 class="text-2xl font-bold text-center mb-4">Calculadora de IMC</h1>
+        
+        <label class="block mb-2">Altura (m):</label>
+        <input type="number" id="altura" step="0.01" placeholder="Ex: 1.75" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+
+        <label class="block mt-4 mb-2">Peso (kg):</label>
+        <input type="number" id="peso" step="0.1" placeholder="Ex: 70.5" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+
+        <button onclick="calcularIMC()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold">Calcular</button>
+
+        <div id="resultado" class="mt-4 text-center font-bold"></div>
+    </div>
+
+    <script>
+        async function calcularIMC() {
+            const altura = document.getElementById("altura").value;
+            const peso = document.getElementById("peso").value;
+            const token = localStorage.getItem("token");  // Token de autenticação do usuário
+
+            if (!altura || !peso) {
+                alert("Por favor, preencha altura e peso.");
+                return;
+            }
+
+            const dados = { altura: parseFloat(altura), peso: parseFloat(peso) };
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/calcular_imc", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("resultado").innerHTML = `
+                <p>Seu IMC é: <span class="text-green-400">${resultado.imc}</span></p>
+                <p>Data: <span class="text-yellow-400">${resultado.data}</span></p>
+            `;
+
+                } else {
+                    alert(resultado.erro || "Erro ao calcular IMC.");
+                }
+            } catch (erro) {
+                console.error("Erro:", erro);
+                alert("Falha ao conectar com o servidor.");
+            }
+        }
+    </script>
+
+</body>
+</html>
